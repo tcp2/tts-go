@@ -1,0 +1,66 @@
+// Package types contains all the type definitions used in the edge-tts-go project.
+package types
+
+// TTSConfig represents the internal TTS configuration for edge-tts-go's Communicate struct.
+type TTSConfig struct {
+	Voice  string
+	Rate   string
+	Volume string
+	Pitch  string
+}
+
+// TTSChunk represents a chunk of data from the TTS service.
+type TTSChunk struct {
+	Type     string // "audio" or "WordBoundary"
+	Data     []byte // only for audio
+	Duration float64 // only for WordBoundary
+	Offset   float64 // only for WordBoundary
+	Text     string  // only for WordBoundary
+}
+
+// VoiceTag represents the voice tag data.
+type VoiceTag struct {
+	ContentCategories  []string
+	VoicePersonalities []string
+}
+
+// Voice represents a voice and its attributes.
+type Voice struct {
+	Name           string
+	ShortName      string
+	Gender         string // "Female" or "Male"
+	Locale         string
+	SuggestedCodec string
+	FriendlyName   string
+	Status         string
+	VoiceTag       VoiceTag
+}
+
+// VoicesManagerVoice represents a voice for the VoicesManager.
+type VoicesManagerVoice struct {
+	Voice
+	Language string
+}
+
+// CommunicateState represents the state of the Communicate struct.
+type CommunicateState struct {
+	PartialText        []byte
+	OffsetCompensation float64
+	LastDurationOffset float64
+	StreamWasCalled    bool
+}
+
+// UtilArgs represents the CLI arguments.
+type UtilArgs struct {
+	Text           string
+	File           string
+	Voice          string
+	ListVoices     bool
+	Rate           string
+	Volume         string
+	Pitch          string
+	WordsInCue     int
+	WriteMedia     string
+	WriteSubtitles string
+	Proxy          string
+}

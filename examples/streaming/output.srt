@@ -1,0 +1,8 @@
+1
+00:00:00,100 --> 00:00:03,725
+Hello World This is an example of how to use
+
+2
+00:00:03,750 --> 00:00:06,900
+the edge-tts-go library with streaming and subtitles
+
