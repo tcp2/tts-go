@@ -27,6 +27,7 @@ type UtilArgs struct {
 	Rate           string
 	Volume         string
 	Pitch          string
+	Boundary       string
 	WordsInCue     int
 	WriteMedia     string
 	WriteSubtitles string
@@ -94,6 +95,7 @@ func main() {
 		args.Proxy,
 		10, // connectTimeout
 		60, // receiveTimeout
+		args.Boundary,
 	)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error creating Communicate instance: %v\n", err)
@@ -139,10 +141,10 @@ func main() {
 				fmt.Fprintf(os.Stderr, "Error writing audio data: %v\n", err)
 				os.Exit(1)
 			}
-		} else if chunk.Type == "WordBoundary" {
+		} else if chunk.Type == "WordBoundary" || chunk.Type == "SentenceBoundary" {
 			err := sm.Feed(chunk)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error feeding WordBoundary: %v\n", err)
+				fmt.Fprintf(os.Stderr, "Error feeding %s: %v\n", chunk.Type, err)
 				os.Exit(1)
 			}
 		}
@@ -188,6 +190,7 @@ func parseArgs() UtilArgs {
 	flag.StringVar(&args.Rate, "rate", "+0%", "set TTS rate")
 	flag.StringVar(&args.Volume, "volume", "+0%", "set TTS volume")
 	flag.StringVar(&args.Pitch, "pitch", "+0Hz", "set TTS pitch")
+	flag.StringVar(&args.Boundary, "boundary", "WordBoundary", "set boundary type (WordBoundary or SentenceBoundary)")
 	flag.IntVar(&args.WordsInCue, "words-in-cue", 10, "number of words in a subtitle cue")
 	flag.StringVar(&args.WriteMedia, "write-media", "", "send media output to file instead of stdout")
 	flag.StringVar(&args.WriteSubtitles, "write-subtitles", "", "send subtitle output to provided file instead of stderr")

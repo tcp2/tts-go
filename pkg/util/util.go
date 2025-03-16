@@ -218,6 +218,17 @@ func ValidateTTSConfig(config *types.TTSConfig) error {
 	if err != nil {
 		return err
 	}
+
+	// Validate the boundary parameter
+	if config.Boundary != "" && config.Boundary != "WordBoundary" && config.Boundary != "SentenceBoundary" {
+		return fmt.Errorf("invalid boundary '%s', expected 'WordBoundary' or 'SentenceBoundary'", config.Boundary)
+	}
+	
+	// Set default boundary if not provided
+	if config.Boundary == "" {
+		config.Boundary = "WordBoundary"
+	}
+	
 	return nil
 }
 

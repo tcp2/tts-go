@@ -36,6 +36,7 @@ func NewCommunicate(
 	proxy string,
 	connectTimeout int,
 	receiveTimeout int,
+	boundary ...string,
 ) (*Communicate, error) {
 	// Set default values
 	if voice == "" {
@@ -57,12 +58,19 @@ func NewCommunicate(
 		receiveTimeout = 60
 	}
 
+	// Set boundary (default to WordBoundary if not provided)
+	boundaryValue := "WordBoundary"
+	if len(boundary) > 0 && boundary[0] != "" {
+		boundaryValue = boundary[0]
+	}
+
 	// Create and validate TTS config
 	ttsConfig := types.TTSConfig{
-		Voice:  voice,
-		Rate:   rate,
-		Volume: volume,
-		Pitch:  pitch,
+		Voice:    voice,
+		Rate:     rate,
+		Volume:   volume,
+		Pitch:    pitch,
+		Boundary: boundaryValue,
 	}
 	err := util.ValidateTTSConfig(&ttsConfig)
 	if err != nil {
@@ -142,7 +150,7 @@ func (c *Communicate) streamPartialText(ctx context.Context, chunkChan chan<- ty
 	defer client.Close()
 
 	// Send the command request
-	err = client.SendCommandRequest()
+	err = client.SendCommandRequest(c.ttsConfig)
 	if err != nil {
 		return err
 	}
@@ -166,7 +174,7 @@ func (c *Communicate) streamPartialText(ctx context.Context, chunkChan chan<- ty
 		if chunk.Type == "audio" {
 			audioWasReceived = true
 			chunkChan <- chunk
-		} else if chunk.Type == "WordBoundary" {
+		} else if chunk.Type == "WordBoundary" || chunk.Type == "SentenceBoundary" {
 			chunkChan <- chunk
 
 			// Update the last duration offset for use by the next SSML request
@@ -227,10 +235,10 @@ func (c *Communicate) Save(ctx context.Context, audioFname string, metadataFname
 			if err != nil {
 				return err
 			}
-		} else if chunk.Type == "WordBoundary" && metadataFile != nil {
+		} else if (chunk.Type == "WordBoundary" || chunk.Type == "SentenceBoundary") && metadataFile != nil {
 			// Write the metadata to the file
-			_, err := fmt.Fprintf(metadataFile, "Offset: %f, Duration: %f, Text: %s\n",
-				chunk.Offset, chunk.Duration, chunk.Text)
+			_, err := fmt.Fprintf(metadataFile, "Type: %s, Offset: %f, Duration: %f, Text: %s\n",
+				chunk.Type, chunk.Offset, chunk.Duration, chunk.Text)
 			if err != nil {
 				return err
 			}

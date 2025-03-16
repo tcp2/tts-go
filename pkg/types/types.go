@@ -3,19 +3,20 @@ package types
 
 // TTSConfig represents the internal TTS configuration for edge-tts-go's Communicate struct.
 type TTSConfig struct {
-	Voice  string
-	Rate   string
-	Volume string
-	Pitch  string
+	Voice    string
+	Rate     string
+	Volume   string
+	Pitch    string
+	Boundary string // "WordBoundary" or "SentenceBoundary"
 }
 
 // TTSChunk represents a chunk of data from the TTS service.
 type TTSChunk struct {
-	Type     string // "audio" or "WordBoundary"
+	Type     string // "audio", "WordBoundary", or "SentenceBoundary"
 	Data     []byte // only for audio
-	Duration float64 // only for WordBoundary
-	Offset   float64 // only for WordBoundary
-	Text     string  // only for WordBoundary
+	Duration float64 // only for WordBoundary and SentenceBoundary
+	Offset   float64 // only for WordBoundary and SentenceBoundary
+	Text     string  // only for WordBoundary and SentenceBoundary
 }
 
 // VoiceTag represents the voice tag data.
@@ -59,6 +60,7 @@ type UtilArgs struct {
 	Rate           string
 	Volume         string
 	Pitch          string
+	Boundary       string
 	WordsInCue     int
 	WriteMedia     string
 	WriteSubtitles string

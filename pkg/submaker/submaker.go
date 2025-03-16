@@ -1,4 +1,4 @@
-// Package submaker is used to generate subtitles from WordBoundary events.
+// Package submaker is used to generate subtitles from WordBoundary and SentenceBoundary events.
 package submaker
 
 import (
@@ -9,7 +9,7 @@ import (
 	"github.com/difyz9/edge-tts-go/pkg/types"
 )
 
-// SubMaker is used to generate subtitles from WordBoundary messages.
+// SubMaker is used to generate subtitles from WordBoundary and SentenceBoundary messages.
 type SubMaker struct {
 	cues []Subtitle
 }
@@ -29,10 +29,10 @@ func NewSubMaker() *SubMaker {
 	}
 }
 
-// Feed feeds a WordBoundary message to the SubMaker.
+// Feed feeds a WordBoundary or SentenceBoundary message to the SubMaker.
 func (sm *SubMaker) Feed(msg types.TTSChunk) error {
-	if msg.Type != "WordBoundary" {
-		return fmt.Errorf("invalid message type, expected 'WordBoundary', got '%s'", msg.Type)
+	if msg.Type != "WordBoundary" && msg.Type != "SentenceBoundary" {
+		return fmt.Errorf("invalid message type, expected 'WordBoundary' or 'SentenceBoundary', got '%s'", msg.Type)
 	}
 
 	sm.cues = append(sm.cues, Subtitle{

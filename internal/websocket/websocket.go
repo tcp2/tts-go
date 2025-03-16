@@ -109,9 +109,17 @@ func (c *Client) Close() error {
 }
 
 // SendCommandRequest sends the command request to the service.
-func (c *Client) SendCommandRequest() error {
+func (c *Client) SendCommandRequest(ttsConfig types.TTSConfig) error {
 	if c.conn == nil {
 		return fmt.Errorf("not connected")
+	}
+
+	wordBoundary := ttsConfig.Boundary == "WordBoundary" || ttsConfig.Boundary == ""
+	wd := "true"
+	sq := "false"
+	if !wordBoundary {
+		wd = "false"
+		sq = "true"
 	}
 
 	message := fmt.Sprintf(
@@ -119,10 +127,10 @@ func (c *Client) SendCommandRequest() error {
 			"Content-Type:application/json; charset=utf-8\r\n"+
 			"Path:speech.config\r\n\r\n"+
 			`{"context":{"synthesis":{"audio":{"metadataoptions":{`+
-			`"sentenceBoundaryEnabled":"false","wordBoundaryEnabled":"true"},`+
+			`"sentenceBoundaryEnabled":"%s","wordBoundaryEnabled":"%s"},`+
 			`"outputFormat":"audio-24khz-48kbitrate-mono-mp3"`+
 			`}}}}`,
-		util.DateToString())
+		util.DateToString(), sq, wd)
 
 	return c.conn.WriteMessage(websocket.TextMessage, []byte(message))
 }
@@ -260,7 +268,7 @@ func (c *Client) parseMetadata(data []byte) (types.TTSChunk, error) {
 			continue
 		}
 
-		if metaType == "WordBoundary" {
+		if metaType == "WordBoundary" || metaType == "SentenceBoundary" {
 			metaData, ok := metaMap["Data"].(map[string]interface{})
 			if !ok {
 				continue
@@ -301,5 +309,5 @@ func (c *Client) parseMetadata(data []byte) (types.TTSChunk, error) {
 		return types.TTSChunk{}, errors.NewUnknownResponseError("unknown metadata type: " + metaType)
 	}
 
-	return types.TTSChunk{}, errors.NewUnexpectedResponseError("no WordBoundary metadata found")
+	return types.TTSChunk{}, errors.NewUnexpectedResponseError("no WordBoundary or SentenceBoundary metadata found")
 }
