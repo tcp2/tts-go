@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -32,6 +33,21 @@ type UtilArgs struct {
 	WriteMedia     string
 	WriteSubtitles string
 	Proxy          string
+}
+
+func cleanText(s: string) {
+	s = strings.ReplaceAll(s, `\n`, ".")
+	s = strings.ReplaceAll(s, `\r`, "")
+
+	specialChars := []string{
+		"$", "#", "@", "&", "%", "^", "*", "(", ")", "_", "+", "=", "{", "}",
+		"\\", "|", "\"", "'", "<", ">", "～", "￥", "©", "™", "®", "~",
+	}
+	for _, char := range specialChars {
+		s = strings.ReplaceAll(s, char, "")
+	}
+	s = strings.Join(strings.Fields(s), " ")
+	return s
 }
 
 func main() {
@@ -73,7 +89,8 @@ func main() {
 			fmt.Fprintf(os.Stderr, "Error reading file: %v\n", err)
 			os.Exit(1)
 		}
-		args.Text = string(data)
+		s := cleanText(string(data))
+		args.Text = s
 	}
 
 	// Check if the user wants to write to the terminal
