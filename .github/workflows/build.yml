@@ -49,7 +49,7 @@ jobs:
           zip tts-${{ matrix.os }}-${{ matrix.arch }}.zip tts-${{ matrix.os }}-${{ matrix.arch }}
 
       - name: Upload binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: tts-${{ matrix.os }}-${{ matrix.arch }}
           path: tts-${{ matrix.os }}-${{ matrix.arch }}.zip
