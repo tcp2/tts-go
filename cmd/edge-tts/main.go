@@ -34,7 +34,7 @@ type UtilArgs struct {
 	Proxy          string
 }
 
-func cleanText(s string) {
+func cleanText(s string) string {
 	s = strings.ReplaceAll(s, `\n`, ".")
 	s = strings.ReplaceAll(s, `\r`, "")
 
