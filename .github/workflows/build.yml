@@ -42,7 +42,7 @@ jobs:
 
       - name: Build the Go binary
         run: |
-          go build -o tts-${{ matrix.os }}-${{ matrix.arch }} cmd/main.go
+          go build -o tts-${{ matrix.os }}-${{ matrix.arch }} ./cmd/main.go
 
       - name: Zip the binary
         run: |
