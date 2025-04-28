@@ -1,0 +1,50 @@
+name: Build Go Binary
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [linux, darwin]    # Chạy cho linux và darwin (macOS)
+        arch: [amd64, arm64]   # Chạy cả amd64 và arm64
+        exclude:
+          - os: linux
+            arch: arm64   # Linux chỉ hỗ trợ amd64
+          - os: darwin
+            arch: amd64   # macOS chỉ hỗ trợ arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.24'
+
+      - name: Set environment variables
+        run: |
+          echo "GOOS=${{ matrix.os }}" >> $GITHUB_ENV
+          echo "GOARCH=${{ matrix.arch }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          go mod tidy
+
+      - name: Build the Go binary
+        run: |
+          go build -o myapp-${{ matrix.os }}-${{ matrix.arch }} cmd/main.go
+
+      - name: Zip the binary
+        run: |
+          zip myapp-${{ matrix.os }}-${{ matrix.arch }}.zip myapp-${{ matrix.os }}-${{ matrix.arch }}
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: tts-${{ matrix.os }}-${{ matrix.arch }}
+          path: tts-${{ matrix.os }}-${{ matrix.arch }}.zip
