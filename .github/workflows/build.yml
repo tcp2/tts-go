@@ -3,6 +3,11 @@ name: Build Go Binary
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write  # Quyền để viết vào repository (bao gồm upload binary)
+  packages: write  # Quyền để đẩy tài nguyên lên GitHub Packages (nếu cần)
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
