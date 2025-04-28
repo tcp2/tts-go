@@ -37,11 +37,11 @@ jobs:
 
       - name: Build the Go binary
         run: |
-          go build -o myapp-${{ matrix.os }}-${{ matrix.arch }} cmd/main.go
+          go build -o tts-${{ matrix.os }}-${{ matrix.arch }} cmd/main.go
 
       - name: Zip the binary
         run: |
-          zip myapp-${{ matrix.os }}-${{ matrix.arch }}.zip myapp-${{ matrix.os }}-${{ matrix.arch }}
+          zip tts-${{ matrix.os }}-${{ matrix.arch }}.zip tts-${{ matrix.os }}-${{ matrix.arch }}
 
       - name: Upload binary
         uses: actions/upload-artifact@v3
