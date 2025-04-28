@@ -1,7 +1,11 @@
 name: Build Go Binary
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
+     
 
 permissions:
   contents: write  # Quyền để viết vào repository (bao gồm upload binary)
@@ -42,7 +46,7 @@ jobs:
 
       - name: Build the Go binary
         run: |
-          go build -o tts-${{ matrix.os }}-${{ matrix.arch }} cmd/main.go
+          go build -o tts-${{ matrix.os }}-${{ matrix.arch }} ./cmd/main.go
 
       - name: Zip the binary
         run: |
